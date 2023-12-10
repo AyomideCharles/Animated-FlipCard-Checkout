@@ -13,8 +13,10 @@ class _FlipCardState extends State<FlipCard>
   late Animation<double> _frontRotation;
   late Animation<double> _backRotation;
 
-  final TextEditingController cardNumberController = TextEditingController();
-  String cardNumberValue = '';
+  TextEditingController cardNumberController = TextEditingController();
+  TextEditingController cardHolderController = TextEditingController();
+  TextEditingController cardExpiryDate = TextEditingController();
+  TextEditingController cvvController = TextEditingController();
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _FlipCardState extends State<FlipCard>
   @override
   void dispose() {
     _controller.dispose();
+
     super.dispose();
   }
 
@@ -46,9 +49,7 @@ class _FlipCardState extends State<FlipCard>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flip Card Example'),
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15),
@@ -68,7 +69,7 @@ class _FlipCardState extends State<FlipCard>
                       alignment: Alignment.center,
                       child: _controller.value < 0.5
                           ? frontCard(Colors.grey.shade500)
-                          : backCard(Colors.green),
+                          : backCard(Colors.grey.shade500),
                     );
                   },
                 ),
@@ -97,7 +98,7 @@ class _FlipCardState extends State<FlipCard>
                       controller: cardNumberController,
                       onChanged: (value) {
                         setState(() {
-                          cardNumberValue = value;
+                          cardNumberController.text;
                         });
                       },
                       decoration: const InputDecoration(
@@ -114,15 +115,22 @@ class _FlipCardState extends State<FlipCard>
                     const SizedBox(
                       height: 10,
                     ),
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      keyboardType: TextInputType.name,
+                      controller: cardHolderController,
+                      onChanged: (value) {
+                        setState(() {
+                          cardHolderController.text;
+                        });
+                      },
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(
                       height: 15,
                     ),
-                    const Row(
+                    Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Flexible(
@@ -130,18 +138,24 @@ class _FlipCardState extends State<FlipCard>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Expiry Date',
                                   style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                                 TextField(
-                                  decoration: InputDecoration(
+                                  controller: cardExpiryDate,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      cardExpiryDate.text;
+                                    });
+                                  },
+                                  decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                   ),
                                 ),
                               ],
                             )),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         Flexible(
@@ -149,12 +163,17 @@ class _FlipCardState extends State<FlipCard>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'CVV',
                                   style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                                 TextField(
-                                  decoration: InputDecoration(
+                                  controller: cvvController,
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    cvvController.text;
+                                  },
+                                  decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                   ),
                                 ),
@@ -186,6 +205,7 @@ class _FlipCardState extends State<FlipCard>
     );
   }
 
+// front of the card
   Widget frontCard(Color color) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -212,36 +232,42 @@ class _FlipCardState extends State<FlipCard>
             height: 30,
           ),
           Text(
-            cardNumberValue.isEmpty ? '#### #### #### ####' : cardNumberValue,
+            cardNumberController.text.isEmpty
+                ? '#### #### #### ####'
+                : cardNumberController.text,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           const Spacer(),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'CARD HOLDER',
                     style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                   ),
                   Text(
-                    'NAME ON CARD',
-                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                    cardHolderController.text.isEmpty
+                        ? 'NAME ON CARD'
+                        : cardHolderController.text.toUpperCase(),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: 15),
                   )
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'EXPIRES',
                     style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                   ),
                   Text(
-                    'MM/YY',
-                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                    cardExpiryDate.text.isEmpty ? 'MM/YY' : cardExpiryDate.text,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: 15),
                   )
                 ],
               )
@@ -252,19 +278,53 @@ class _FlipCardState extends State<FlipCard>
     );
   }
 
+// back of the card
   Widget backCard(Color color) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         color: color,
       ),
       width: double.infinity,
       height: 230,
-      child: const Center(
-        child: Text(
-          'dfghj',
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 30),
+            height: 50,
+            width: double.infinity,
+            color: Colors.black,
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.all(20),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.white),
+                borderRadius: BorderRadius.circular(10)),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              const Text(
+                'CVV',
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(7),
+                  color: Colors.white,
+                ),
+                height: 40,
+                child: Center(
+                  child: Text(cvvController.text),
+                ),
+              )
+            ]),
+          )
+        ],
       ),
     );
   }
