@@ -13,6 +13,9 @@ class _FlipCardState extends State<FlipCard>
   late Animation<double> _frontRotation;
   late Animation<double> _backRotation;
 
+  final TextEditingController cardNumberController = TextEditingController();
+  String cardNumberValue = '';
+
   @override
   void initState() {
     super.initState();
@@ -30,7 +33,6 @@ class _FlipCardState extends State<FlipCard>
   void dispose() {
     _controller.dispose();
     super.dispose();
-    _cardNumber.dispose();
   }
 
   void _toggleCard() {
@@ -40,8 +42,6 @@ class _FlipCardState extends State<FlipCard>
       _controller.forward();
     }
   }
-
-  final TextEditingController _cardNumber = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +67,7 @@ class _FlipCardState extends State<FlipCard>
                             : _backRotation.value * 3.1415927 / 180),
                       alignment: Alignment.center,
                       child: _controller.value < 0.5
-                          ? frontCard(_cardNumber.text, Colors.grey.shade500)
+                          ? frontCard(Colors.grey.shade500)
                           : backCard(Colors.green),
                     );
                   },
@@ -93,7 +93,13 @@ class _FlipCardState extends State<FlipCard>
                       height: 10,
                     ),
                     TextField(
-                      controller: _cardNumber,
+                      keyboardType: TextInputType.number,
+                      controller: cardNumberController,
+                      onChanged: (value) {
+                        setState(() {
+                          cardNumberValue = value;
+                        });
+                      },
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                       ),
@@ -180,7 +186,7 @@ class _FlipCardState extends State<FlipCard>
     );
   }
 
-  Widget frontCard(String _cardNumber, Color color) {
+  Widget frontCard(Color color) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -202,7 +208,45 @@ class _FlipCardState extends State<FlipCard>
               FlutterLogo()
             ],
           ),
-          Text(_cardNumber)
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            cardNumberValue.isEmpty ? '#### #### #### ####' : cardNumberValue,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+          const Spacer(),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'CARD HOLDER',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  ),
+                  Text(
+                    'NAME ON CARD',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  )
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'EXPIRES',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  ),
+                  Text(
+                    'MM/YY',
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  )
+                ],
+              )
+            ],
+          )
         ],
       ),
     );
