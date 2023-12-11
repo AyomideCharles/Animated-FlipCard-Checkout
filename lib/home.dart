@@ -34,7 +34,6 @@ class _FlipCardState extends State<FlipCard>
   @override
   void dispose() {
     _controller.dispose();
-
     super.dispose();
   }
 
@@ -68,7 +67,7 @@ class _FlipCardState extends State<FlipCard>
                             : _backRotation.value * 3.1415927 / 180),
                       alignment: Alignment.center,
                       child: _controller.value < 0.5
-                          ? frontCard(Colors.grey.shade500)
+                          ? frontCard()
                           : backCard(Colors.grey.shade500),
                     );
                   },
@@ -94,6 +93,7 @@ class _FlipCardState extends State<FlipCard>
                       height: 10,
                     ),
                     TextField(
+                      onTap: () {},
                       keyboardType: TextInputType.number,
                       controller: cardNumberController,
                       onChanged: (value) {
@@ -143,6 +143,7 @@ class _FlipCardState extends State<FlipCard>
                                   style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                                 TextField(
+                                  keyboardType: TextInputType.number,
                                   controller: cardExpiryDate,
                                   onChanged: (value) {
                                     setState(() {
@@ -168,10 +169,15 @@ class _FlipCardState extends State<FlipCard>
                                   style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                                 TextField(
+                                  onTap: () {
+                                    _toggleCard();
+                                  },
                                   controller: cvvController,
                                   keyboardType: TextInputType.number,
                                   onChanged: (value) {
-                                    cvvController.text;
+                                    setState(() {
+                                      cvvController.text;
+                                    });
                                   },
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -206,36 +212,129 @@ class _FlipCardState extends State<FlipCard>
   }
 
 // front of the card
-  Widget frontCard(Color color) {
+  // Widget frontCard() {
+  //   return Container(
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.circular(8),
+  //       gradient: const LinearGradient(
+  //         begin: Alignment.topLeft,
+  //         end: Alignment.bottomRight,
+  //         colors: [Colors.blue, Colors.green],
+  //       ),
+  //     ),
+  //     width: double.infinity,
+  //     height: 230,
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             const Text(
+  //               'business credit',
+  //               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+  //             ),
+  //             Image.asset('assets/temassiz.png')
+  //           ],
+  //         ),
+  //         const SizedBox(
+  //           height: 30,
+  //         ),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text(
+  //               cardNumberController.text.isEmpty
+  //                   ? '**** **** **** ****'
+  //                   : cardNumberController.text,
+  //               style:
+  //                   const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+  //             ),
+  //             Image.asset('assets/cip.png')
+  //           ],
+  //         ),
+  //         const Spacer(),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 const Text(
+  //                   'CARD HOLDER',
+  //                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+  //                 ),
+  //                 Text(
+  //                   cardHolderController.text.isEmpty
+  //                       ? 'NAME ON CARD'
+  //                       : cardHolderController.text.toUpperCase(),
+  //                   style: const TextStyle(
+  //                       fontWeight: FontWeight.w500, fontSize: 15),
+  //                 )
+  //               ],
+  //             ),
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 const Text(
+  //                   'EXPIRES',
+  //                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+  //                 ),
+  //                 Text(
+  //                   cardExpiryDate.text.isEmpty ? 'MM/YY' : cardExpiryDate.text,
+  //                   style: const TextStyle(
+  //                       fontWeight: FontWeight.w500, fontSize: 15),
+  //                 )
+  //               ],
+  //             )
+  //           ],
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // front of the card
+  Widget frontCard() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: color,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.blue, Colors.green],
+        ),
       ),
       width: double.infinity,
       height: 230,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Credit Card',
+              const Text(
+                'business credit',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
-              FlutterLogo()
+              Image.asset('assets/temassiz.png')
             ],
           ),
           const SizedBox(
             height: 30,
           ),
-          Text(
-            cardNumberController.text.isEmpty
-                ? '#### #### #### ####'
-                : cardNumberController.text,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                generateMaskedCardNumber(),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              ),
+              Image.asset('assets/cip.png')
+            ],
           ),
           const Spacer(),
           Row(
@@ -276,6 +375,15 @@ class _FlipCardState extends State<FlipCard>
         ],
       ),
     );
+  }
+
+  String generateMaskedCardNumber() {
+    final String rawCardNumber = cardNumberController.text;
+    const int totalDigits = 16;
+    final int enteredDigits = rawCardNumber.length;
+    final String maskedPart = '*' * (totalDigits - enteredDigits);
+
+    return '$enteredDigits$maskedPart';
   }
 
 // back of the card
