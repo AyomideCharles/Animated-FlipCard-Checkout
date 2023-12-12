@@ -1,4 +1,6 @@
+import 'package:bankcard_flip/widgets/payment_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FlipCard extends StatefulWidget {
   const FlipCard({super.key});
@@ -47,6 +49,7 @@ class _FlipCardState extends State<FlipCard>
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -104,6 +107,10 @@ class _FlipCardState extends State<FlipCard>
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(16)
+                      ],
                     ),
                     const SizedBox(
                       height: 15,
@@ -193,17 +200,21 @@ class _FlipCardState extends State<FlipCard>
               const SizedBox(
                 height: 25,
               ),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
-                      backgroundColor: Colors.grey.shade600,
-                      minimumSize: const Size(double.infinity, 50)),
-                  onPressed: () {},
-                  child: const Text(
-                    'Checkout',
-                    style: TextStyle(color: Colors.white),
-                  ))
+              PaymentButton(
+                enabled: true,
+                width: screenSize.width - 20 * 2,
+              ),
+              // ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //         shape: RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(5)),
+              //         backgroundColor: Colors.grey.shade600,
+              //         minimumSize: const Size(double.infinity, 50)),
+              //     onPressed: () {},
+              //     child: const Text(
+              //       'Checkout',
+              //       style: TextStyle(color: Colors.white),
+              //     ))
             ],
           ),
         ),
@@ -380,10 +391,22 @@ class _FlipCardState extends State<FlipCard>
   String generateMaskedCardNumber() {
     final String rawCardNumber = cardNumberController.text;
     const int totalDigits = 16;
-    final int enteredDigits = rawCardNumber.length;
-    final String maskedPart = '*' * (totalDigits - enteredDigits);
 
-    return '$enteredDigits$maskedPart';
+    if (rawCardNumber.length >= totalDigits) {
+      return rawCardNumber;
+    }
+
+    final int enteredDigits = rawCardNumber.length;
+    final int remainingDigits = totalDigits - enteredDigits;
+    final int fullGroups = enteredDigits ~/ 4;
+    final int lastGroupDigits = enteredDigits % 4;
+
+    final String enteredPart =
+        List.generate(fullGroups, (_) => '****').join(' ');
+    final String lastGroup =
+        rawCardNumber.substring(enteredDigits - lastGroupDigits);
+
+    return '$enteredPart $lastGroup';
   }
 
 // back of the card

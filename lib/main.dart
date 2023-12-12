@@ -21,18 +21,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// String generateMaskedCardNumber() {
-//   final String rawCardNumber = cardNumberController.text;
-//   final int totalDigits = 16;
-//   final int enteredDigits = rawCardNumber.length;
-//   final String maskedPart = '*' * (totalDigits - enteredDigits);
-
-//   // If there are characters entered, replace asterisks one by one
-//   final String visiblePart = rawCardNumber
-//       .split('')
-//       .take(totalDigits - maskedPart.length)
-//       .join();
-
-//   return '$maskedPart$visiblePart';
-// }
