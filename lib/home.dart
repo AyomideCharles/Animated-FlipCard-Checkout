@@ -69,9 +69,7 @@ class _FlipCardState extends State<FlipCard>
                             ? _frontRotation.value * 3.1415927 / 180
                             : _backRotation.value * 3.1415927 / 180),
                       alignment: Alignment.center,
-                      child: _controller.value < 0.5
-                          ? frontCard()
-                          : backCard(Colors.grey.shade500),
+                      child: _controller.value < 0.5 ? frontCard() : backCard(),
                     );
                   },
                 ),
@@ -204,107 +202,12 @@ class _FlipCardState extends State<FlipCard>
                 enabled: true,
                 width: screenSize.width - 20 * 2,
               ),
-              // ElevatedButton(
-              //     style: ElevatedButton.styleFrom(
-              //         shape: RoundedRectangleBorder(
-              //             borderRadius: BorderRadius.circular(5)),
-              //         backgroundColor: Colors.grey.shade600,
-              //         minimumSize: const Size(double.infinity, 50)),
-              //     onPressed: () {},
-              //     child: const Text(
-              //       'Checkout',
-              //       style: TextStyle(color: Colors.white),
-              //     ))
             ],
           ),
         ),
       ),
     );
   }
-
-// front of the card
-  // Widget frontCard() {
-  //   return Container(
-  //     padding: const EdgeInsets.all(20),
-  //     decoration: BoxDecoration(
-  //       borderRadius: BorderRadius.circular(8),
-  //       gradient: const LinearGradient(
-  //         begin: Alignment.topLeft,
-  //         end: Alignment.bottomRight,
-  //         colors: [Colors.blue, Colors.green],
-  //       ),
-  //     ),
-  //     width: double.infinity,
-  //     height: 230,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             const Text(
-  //               'business credit',
-  //               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-  //             ),
-  //             Image.asset('assets/temassiz.png')
-  //           ],
-  //         ),
-  //         const SizedBox(
-  //           height: 30,
-  //         ),
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             Text(
-  //               cardNumberController.text.isEmpty
-  //                   ? '**** **** **** ****'
-  //                   : cardNumberController.text,
-  //               style:
-  //                   const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-  //             ),
-  //             Image.asset('assets/cip.png')
-  //           ],
-  //         ),
-  //         const Spacer(),
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 const Text(
-  //                   'CARD HOLDER',
-  //                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-  //                 ),
-  //                 Text(
-  //                   cardHolderController.text.isEmpty
-  //                       ? 'NAME ON CARD'
-  //                       : cardHolderController.text.toUpperCase(),
-  //                   style: const TextStyle(
-  //                       fontWeight: FontWeight.w500, fontSize: 15),
-  //                 )
-  //               ],
-  //             ),
-  //             Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 const Text(
-  //                   'EXPIRES',
-  //                   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-  //                 ),
-  //                 Text(
-  //                   cardExpiryDate.text.isEmpty ? 'MM/YY' : cardExpiryDate.text,
-  //                   style: const TextStyle(
-  //                       fontWeight: FontWeight.w500, fontSize: 15),
-  //                 )
-  //               ],
-  //             )
-  //           ],
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
   // front of the card
   Widget frontCard() {
@@ -398,23 +301,25 @@ class _FlipCardState extends State<FlipCard>
 
     final int enteredDigits = rawCardNumber.length;
     final int remainingDigits = totalDigits - enteredDigits;
-    final int fullGroups = enteredDigits ~/ 4;
-    final int lastGroupDigits = enteredDigits % 4;
+    final String maskedPart =
+        '**** **** **** ****'.substring(0, remainingDigits);
+    final String enteredPart = rawCardNumber.substring(0, enteredDigits);
 
-    final String enteredPart =
-        List.generate(fullGroups, (_) => '****').join(' ');
-    final String lastGroup =
-        rawCardNumber.substring(enteredDigits - lastGroupDigits);
-
-    return '$enteredPart $lastGroup';
+    return '$enteredPart$maskedPart';
   }
 
+
+
 // back of the card
-  Widget backCard(Color color) {
+  Widget backCard() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: color,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.blue, Colors.green],
+        ),
       ),
       width: double.infinity,
       height: 230,

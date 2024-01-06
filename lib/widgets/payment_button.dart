@@ -113,7 +113,7 @@ class _PaymentButtonState extends State<PaymentButton>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Slide to pay',
+                    'Slide to Checkout',
                     style: TextStyle(fontSize: 18),
                   ),
                   const SizedBox(width: 10),
@@ -194,10 +194,14 @@ class _PaymentButtonState extends State<PaymentButton>
             ? 2 * pi * loadingAnimationValue
             : 0.0;
 
-    Widget child = const SizedBox(
+    Widget child = SizedBox(
       width: 60,
       child: Center(
-        child: Icon(FeatherIcons.dollarSign),
+        child: Image.network(
+          'https://th.bing.com/th/id/R.81975c6ae848e6da09363d49ad2bdd05?rik=LM%2b9vvFQNGBOeQ&pid=ImgRaw&r=0',
+          fit: BoxFit.fitWidth,
+        ),
+        // child: Icon(FeatherIcons.dollarSign),
         // child: Image.asset(
         //   'assets/icons/dollar.png',
         //   width: 30,
