@@ -194,18 +194,10 @@ class _PaymentButtonState extends State<PaymentButton>
             ? 2 * pi * loadingAnimationValue
             : 0.0;
 
-    Widget child = SizedBox(
+    Widget child = const SizedBox(
       width: 60,
       child: Center(
-        child: Image.network(
-          'https://th.bing.com/th/id/R.81975c6ae848e6da09363d49ad2bdd05?rik=LM%2b9vvFQNGBOeQ&pid=ImgRaw&r=0',
-          fit: BoxFit.fitWidth,
-        ),
-        // child: Icon(FeatherIcons.dollarSign),
-        // child: Image.asset(
-        //   'assets/icons/dollar.png',
-        //   width: 30,
-        // ),
+        child: Icon(FeatherIcons.dollarSign),
       ),
     );
 

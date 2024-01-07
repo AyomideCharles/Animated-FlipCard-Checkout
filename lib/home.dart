@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bankcard_flip/widgets/payment_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -152,12 +154,17 @@ class _FlipCardState extends State<FlipCard>
                                   controller: cardExpiryDate,
                                   onChanged: (value) {
                                     setState(() {
-                                      cardExpiryDate.text;
+                                      // cardExpiryDate.text;
+                                      formatCardExpiryDate(value);
                                     });
                                   },
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                   ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(4)
+                                  ],
                                 ),
                               ],
                             )),
@@ -292,23 +299,55 @@ class _FlipCardState extends State<FlipCard>
   }
 
   String generateMaskedCardNumber() {
-    final String rawCardNumber = cardNumberController.text;
+    final String rawCardNumber = cardNumberController.text
+        .replaceAll(RegExp(r'\D'), ''); // Remove non-numeric characters
     const int totalDigits = 16;
 
     if (rawCardNumber.length >= totalDigits) {
-      return rawCardNumber;
+      return formatCardNumber(rawCardNumber);
     }
 
     final int enteredDigits = rawCardNumber.length;
     final int remainingDigits = totalDigits - enteredDigits;
-    final String maskedPart =
-        '**** **** **** ****'.substring(0, remainingDigits);
-    final String enteredPart = rawCardNumber.substring(0, enteredDigits);
 
-    return '$enteredPart$maskedPart';
+    // Calculate the number of sets of 4 asterisks needed with a space between each set.
+    final int setsOfAsterisks = (remainingDigits / 4).ceil();
+
+    // Create a masked part with 4 asterisks and a space between each set.
+    final String maskedPart = List.filled(setsOfAsterisks, '****').join(' ');
+
+    // Extract the entered part of the card number.
+    final String enteredPart = formatCardNumber(rawCardNumber);
+
+    // Concatenate the entered part and the masked part to form the masked card number.
+    return '$enteredPart $maskedPart';
   }
 
+// Function to format the card number in sets of 4
+  String formatCardNumber(String cardNumber) {
+    return RegExp(r'.{1,4}')
+        .allMatches(cardNumber)
+        .map((match) => match.group(0)!)
+        .join(' ');
+  }
 
+  // String generateMaskedCardNumber() {
+  //   final String rawCardNumber =
+  //       cardNumberController.text.replaceAll(RegExp(r'\D'), '');
+  //   const int totalDigits = 16;
+
+  //   if (rawCardNumber.length >= totalDigits) {
+  //     return rawCardNumber;
+  //   }
+
+  //   final int enteredDigits = rawCardNumber.length;
+  //   final int remainingDigits = totalDigits - enteredDigits;
+  //   final String maskedPart =
+  //       '**** **** **** ****'.substring(0, remainingDigits);
+  //   final String enteredPart = rawCardNumber.substring(0, enteredDigits);
+
+  //   return '$enteredPart$maskedPart';
+  // }
 
 // back of the card
   Widget backCard() {
@@ -363,5 +402,16 @@ class _FlipCardState extends State<FlipCard>
         ],
       ),
     );
+  }
+
+// format for the expiry date
+  void formatCardExpiryDate(String input) {
+    if (input.length >= 3) {
+      cardExpiryDate.text =
+          '${input.substring(0, 2)}/${input.substring(2, min(4, input.length))}';
+      cardExpiryDate.selection = TextSelection.fromPosition(
+        TextPosition(offset: cardExpiryDate.text.length),
+      );
+    }
   }
 }
