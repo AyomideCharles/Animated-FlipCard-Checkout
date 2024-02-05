@@ -298,38 +298,67 @@ class _FlipCardState extends State<FlipCard>
     );
   }
 
-  String generateMaskedCardNumber() {
-    final String rawCardNumber = cardNumberController.text
-        .replaceAll(RegExp(r'\D'), ''); // Remove non-numeric characters
-    const int totalDigits = 16;
 
-    if (rawCardNumber.length >= totalDigits) {
-      return formatCardNumber(rawCardNumber);
+
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
     }
+    String inputData = newValue.text;
+    StringBuffer buffer = StringBuffer();
 
-    final int enteredDigits = rawCardNumber.length;
-    final int remainingDigits = totalDigits - enteredDigits;
+    for (var i = 0; i < inputData.length; i++) {
+      buffer.write(inputData[i]);
+      int index = i + 1;
 
-    // Calculate the number of sets of 4 asterisks needed with a space between each set.
-    final int setsOfAsterisks = (remainingDigits / 4).ceil();
-
-    // Create a masked part with 4 asterisks and a space between each set.
-    final String maskedPart = List.filled(setsOfAsterisks, '****').join(' ');
-
-    // Extract the entered part of the card number.
-    final String enteredPart = formatCardNumber(rawCardNumber);
-
-    // Concatenate the entered part and the masked part to form the masked card number.
-    return '$enteredPart $maskedPart';
+      if (index % 4 == 0 && inputData.length != index) {
+        buffer.write("  ");
+      }
+    }
+    return TextEditingValue(
+      text: buffer.toString(),
+      selection: TextSelection.collapsed(
+        offset: buffer.toString().length,
+      ),
+    );
   }
+
+
+
+
+  // String generateMaskedCardNumber() {
+  //   final String rawCardNumber = cardNumberController.text
+  //       .replaceAll(RegExp(r'\D'), ''); // Remove non-numeric characters
+  //   const int totalDigits = 16;
+
+  //   if (rawCardNumber.length >= totalDigits) {
+  //     return formatCardNumber(rawCardNumber);
+  //   }
+
+  //   final int enteredDigits = rawCardNumber.length;
+  //   final int remainingDigits = totalDigits - enteredDigits;
+
+  //   // Calculate the number of sets of 4 asterisks needed with a space between each set.
+  //   final int setsOfAsterisks = (remainingDigits / 4).ceil();
+
+  //   // Create a masked part with 4 asterisks and a space between each set.
+  //   final String maskedPart = List.filled(setsOfAsterisks, '****').join(' ');
+
+  //   // Extract the entered part of the card number.
+  //   final String enteredPart = formatCardNumber(rawCardNumber);
+
+  //   // Concatenate the entered part and the masked part to form the masked card number.
+  //   return '$enteredPart $maskedPart';
+  // }
 
 // Function to format the card number in sets of 4
-  String formatCardNumber(String cardNumber) {
-    return RegExp(r'.{1,4}')
-        .allMatches(cardNumber)
-        .map((match) => match.group(0)!)
-        .join(' ');
-  }
+  // String formatCardNumber(String cardNumber) {
+  //   return RegExp(r'.{1,4}')
+  //       .allMatches(cardNumber)
+  //       .map((match) => match.group(0)!)
+  //       .join(' ');
+  // }
 
   // String generateMaskedCardNumber() {
   //   final String rawCardNumber =
